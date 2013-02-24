@@ -15,6 +15,8 @@
 if(document.getElementsByTagName('html')[0].getAttribute('itemscope') != null)
   throw('Ingress Intel Website is down, not a userscript issue.');
 
+window.iitcBuildDate = '@@BUILDDATE@@';
+
 // disable vanilla JS
 window.onload = function() {};
 
@@ -52,7 +54,7 @@ for(var i = 0; i < d.length; i++) {
 var ir = window.internalResources || [];
 
 var mainstyle = 'http://breunigs.github.com/ingress-intel-total-conversion/style.css?@@BUILDDATE@@';
-var smartphone = 'http://breunigs.github.com/ingress-intel-total-conversion/smartphone.css?@@BUILDDATE@@';
+var smartphone = 'http://breunigs.github.com/ingress-intel-total-conversion/mobile/smartphone.css?@@BUILDDATE@@';
 var leaflet = 'http://cdn.leafletjs.com/leaflet-0.5/leaflet.css';
 var coda = 'http://fonts.googleapis.com/css?family=Coda';
 
@@ -100,13 +102,14 @@ document.getElementsByTagName('body')[0].innerHTML = ''
   + '    <div id="gamestat">&nbsp;loading global control stats</div>'
   + '    <input id="geosearch" placeholder="Search location…" type="text"/>'
   + '    <div id="portaldetails"></div>'
-  + '    <input id="redeem" placeholder="Redeem code… (currently down from web)" type="text"/>'
+  + '    <input id="redeem" placeholder="Redeem code…" type="text"/>'
   + '    <div id="toolbox">'
   + '      <a onmouseover="setPermaLink(this)">permalink</a>'
   + '      <a href="https://github.com/breunigs/ingress-intel-total-conversion#readme" title="IITC = Ingress Intel Total Conversion.\n\nOn the script’s homepage you can:\n– find updates\n– get plugins\n– report bugs\n– and contribute." style="cursor: help">IITC’s page</a></div>'
   + '  </div>'
   + '</div>'
-  + '<div id="updatestatus"></div>';
+  + '<div id="updatestatus"></div>'
+  + '<div id="dialog"></div>';
 
 // putting everything in a wrapper function that in turn is placed in a
 // script tag on the website allows us to execute in the site’s context
@@ -155,7 +158,7 @@ window.MAX_DRAWN_FIELDS = 200;
 window.RESONATOR_DISPLAY_ZOOM_LEVEL = 17;
 
 window.COLOR_SELECTED_PORTAL = '#f00';
-window.COLORS = ['#FFCE00', '#0088FF', '#03FE03']; // none, res, enl
+window.COLORS = ['#FFCE00', '#0088FF', '#03DC03']; // none, res, enl
 window.COLORS_LVL = ['#000', '#FECE5A', '#FFA630', '#FF7315', '#E40000', '#FD2992', '#EB26CD', '#C124E0', '#9627F4'];
 window.COLORS_MOD = {VERY_RARE: '#F78AF6', RARE: '#AD8AFF', COMMON: '#84FBBD'};
 

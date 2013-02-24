@@ -28,6 +28,9 @@ Please follow the these guidelines. Some are just preference, others are good pr
 - jQuery is your friend
 - indent using two spaces
 - opening brace on the same line with a space after the if/for/etc: `if(blub) {`
+- else clauses: `} else if(blub) {` or `} else {`
+- comments: `// this is a comment`
+- quotes: Use single-quotes for JavaScript and double-quotes for HTML content. Example: `$('body').append('<div id="soup">Soup!</div>');`.
 - there is no length limit on lines, but try to keep them short where suitable
 
 
@@ -35,11 +38,12 @@ Sending patches
 ---------------
 
 - use GitHub and git to fork the repository
+- match the code style as shown above
 - use [GitHub’s pull request feature](https://help.github.com/articles/using-pull-requests) to submit patches easily
 - use one pull request for one feature – don’t put many things into one request. This makes reviewing harder for me.
 - you can use `git add -p` to selectively add parts to a commit. This allows for clear commit messages instead of “implement everything” ones.
 
-For plugins this is less strict, but I still review those.
+~~For plugins this is less strict, but I still review those.~~ It applies to plugins as well.
 
 
 Debugging
@@ -64,7 +68,7 @@ How do I report bugs?
 - press `SHIFT+F5` (or shift-click the reload button). Wait for the page to load.
 - press `CTRL+F5`, same as above.
 
-If your issue persists, continue. Provide **all** of the information below, even if you don’t think this is necessary.
+If your issue persists, continue. The next step is to look for existing issues, maybe someone else has a similar problem. You can look [through the existing issues](https://github.com/breunigs/ingress-intel-total-conversion/issues?sort=updated&state=open) or use the search function on the top right. If your issue persists, open a new issue and provide **all** of the information below, even if you don’t think this is necessary.
 
 - a descriptive title
 - your browser and its version

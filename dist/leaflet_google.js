@@ -21,7 +21,7 @@ L.Google = L.Class.extend({
     L.Util.setOptions(this, options);
     if(type === 'INGRESS') {
       type = 'ROADMAP';
-      this._styles = [{featureType:"all", elementType:"all", stylers:[{visibility:"on"}, {hue:"#0091ff"}, {invert_lightness:true}]}, {featureType:"water", elementType:"all", stylers:[{visibility:"on"}, {hue:"#005eff"}, {invert_lightness:true}]}, {featureType:"poi", stylers:[{visibility:"off"}]}, {featureType:"transit", elementType:"all", stylers:[{visibility:"off"}]}];
+      this._styles = [{featureType:"all", elementType:"all", stylers:[{visibility:"on"}, {hue:"#131c1c"}, {saturation:"-50"}, {invert_lightness:true}]}, {featureType:"water", elementType:"all", stylers:[{visibility:"on"}, {hue:"#005eff"}, {invert_lightness:true}]}, {featureType:"poi", stylers:[{visibility:"off"}]}, {featureType:"transit", elementType:"all", stylers:[{visibility:"off"}]}];
     } else {
       this._styles = null;
     }
@@ -92,6 +92,7 @@ L.Google = L.Class.extend({
     var map = new google.maps.Map(this._container, {
         center: this._google_center,
         zoom: 0,
+        tilt: 0,
         styles: this._styles,
         mapTypeId: this._type,
         disableDefaultUI: true,
@@ -138,8 +139,8 @@ L.Google = L.Class.extend({
 
   _resize: function() {
     var size = this._map.getSize();
-    if (this._container.style.width == size.x &&
-        this._container.style.height == size.y)
+    if (parseInt(this._container.style.width) == size.x &&
+        parseInt(this._container.style.height) == size.y)
       return;
     this._container.style.width = size.x + 'px';
     this._container.style.height = size.y + 'px';

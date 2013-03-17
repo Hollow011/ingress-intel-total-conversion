@@ -21,7 +21,7 @@ L.Google = L.Class.extend({
     L.Util.setOptions(this, options);
     if(type === 'INGRESS') {
       type = 'ROADMAP';
-      this._styles = [{featureType:"all", elementType:"all", stylers:[{visibility:"on"}, {hue:"#0091ff"}, {invert_lightness:true}]}, {featureType:"water", elementType:"all", stylers:[{visibility:"on"}, {hue:"#005eff"}, {invert_lightness:true}]}, {featureType:"poi", stylers:[{visibility:"off"}]}, {featureType:"transit", elementType:"all", stylers:[{visibility:"off"}]}];
+      this._styles = [{featureType:"all", elementType:"all", stylers:[{visibility:"on"}, {hue:"#131c1c"}, {saturation:"-50"}, {invert_lightness:true}]}, {featureType:"water", elementType:"all", stylers:[{visibility:"on"}, {hue:"#005eff"}, {invert_lightness:true}]}, {featureType:"poi", stylers:[{visibility:"off"}]}, {featureType:"transit", elementType:"all", stylers:[{visibility:"off"}]}];
     } else {
       this._styles = null;
     }
@@ -36,12 +36,11 @@ L.Google = L.Class.extend({
     this._initContainer();
     this._initMapObject();
 
-    // set up events
-    map.on('viewreset', this._resetCallback, this);
+    this._map.options.zoomAnimation = false;
 
-    this._limitedUpdate = L.Util.limitExecByInterval(this._update, 150, this);
+    // set up events
+    //~ map.on('viewreset', this._resetCallback, this);
     map.on('move', this._update, this);
-    //map.on('moveend', this._update, this);
 
     this._reset();
     this._update();
@@ -51,7 +50,8 @@ L.Google = L.Class.extend({
     this._map._container.removeChild(this._container);
     //this._container = null;
 
-    this._map.off('viewreset', this._resetCallback, this);
+    //~ this._map.off('viewreset', this._resetCallback, this);
+    this._map.options.zoomAnimation = true;
 
     this._map.off('move', this._update, this);
     //this._map.off('moveend', this._update, this);
@@ -93,6 +93,7 @@ L.Google = L.Class.extend({
         center: this._google_center,
         zoom: 0,
         styles: this._styles,
+        tilt: 0,
         mapTypeId: this._type,
         disableDefaultUI: true,
         keyboardShortcuts: false,
@@ -108,6 +109,8 @@ L.Google = L.Class.extend({
 
     map.backgroundColor = '#ff0000';
     this._google = map;
+    this._lastZoomPosition = null;
+    this._lastMapPosition = null;
   },
 
   _resetCallback: function(e) {
@@ -121,28 +124,31 @@ L.Google = L.Class.extend({
   _update: function() {
     this._resize();
 
-    var bounds = this._map.getBounds();
-    var ne = bounds.getNorthEast();
-    var sw = bounds.getSouthWest();
-    var google_bounds = new google.maps.LatLngBounds(
-      new google.maps.LatLng(sw.lat, sw.lng),
-      new google.maps.LatLng(ne.lat, ne.lng)
-    );
-    var center = this._map.getCenter();
-    var _center = new google.maps.LatLng(center.lat, center.lng);
+    // update map position if required
+    var newCenter = this._map.getCenter();
+    if(this._lastMapPosition !== newCenter) {
+      var _center = new google.maps.LatLng(newCenter.lat, newCenter.lng);
+      this._google.setCenter(_center);
+    }
+    this._lastMapPosition = newCenter;
 
-    this._google.setCenter(_center);
-    this._google.setZoom(this._map.getZoom());
-    //this._google.fitBounds(google_bounds);
+    // update zoom level if required
+    var newZoom = this._map.getZoom();
+    if(this._lastZoomPosition !== newZoom) {
+      this._google.setZoom(this._map.getZoom());
+    }
+    this._lastZoomPosition = newZoom;
   },
 
   _resize: function() {
     var size = this._map.getSize();
-    if (this._container.style.width == size.x &&
-        this._container.style.height == size.y)
+    if (parseInt(this._container.style.width) == size.x &&
+        parseInt(this._container.style.height) == size.y)
       return;
+
     this._container.style.width = size.x + 'px';
     this._container.style.height = size.y + 'px';
+
     google.maps.event.trigger(this._google, "resize");
   },
 

@@ -152,6 +152,8 @@ window.chat.handleFaction = function(data, textStatus, jqXHR) {
   chat.writeDataToHash(data, chat._factionData, false);
   var oldMsgsWereAdded = old !== chat.getOldestTimestamp(true);
 
+  runHooks('factionChatDataAvailable', {raw: data, processed: chat._factionData});
+
   window.chat.renderFaction(oldMsgsWereAdded);
 
   if(data.result.length >= CHAT_FACTION_ITEMS) chat.needMoreMessages();
@@ -279,8 +281,14 @@ window.chat.writeDataToHash = function(newData, storageHash, skipSecureMsgs) {
 
       case 'PORTAL':
         var latlng = [markup[1].latE6/1E6, markup[1].lngE6/1E6];
-        var js = 'window.zoomToAndShowPortal(\''+markup[1].guid+'\', ['+latlng[0]+', '+latlng[1]+'])';
-        msg += '<a onclick="'+js+'" title="'+markup[1].address+'" class="help">'+markup[1].name+'</a>';
+        var perma = 'https://ingress.com/intel?latE6='+markup[1].latE6+'&lngE6='+markup[1].lngE6+'&z=17&pguid='+markup[1].guid;
+        var js = 'window.zoomToAndShowPortal(\''+markup[1].guid+'\', ['+latlng[0]+', '+latlng[1]+']);return false';
+
+        msg += '<a onclick="'+js+'"'
+          + ' title="'+markup[1].address+'"'
+          + ' href="'+perma+'" class="help">'
+          + window.chat.getChatPortalName(markup[1])
+          + '</a>';
         break;
 
       case 'SECURE':
@@ -297,6 +305,16 @@ window.chat.writeDataToHash = function(newData, storageHash, skipSecureMsgs) {
 
     window.setPlayerName(pguid, nick); // free nick name resolves
   });
+}
+
+// Override portal names that are used over and over, such as 'US Post Office'
+window.chat.getChatPortalName = function(markup) {
+  var name = markup.name;
+  if(name === 'US Post Office') {
+    var address = markup.address.split(',');
+    name = 'USPS: ' + address[0];
+  }
+  return name;
 }
 
 // renders data from the data-hash to the element defined by the given
@@ -341,7 +359,7 @@ window.chat.renderMsg = function(msg, nick, time, team) {
   var s = 'style="color:'+COLORS[team]+'"';
   var title = nick.length >= 8 ? 'title="'+nick+'" class="help"' : '';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
-  return '<tr><td>'+t+'</td><td>'+i[0]+'<mark '+s+'>'+nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
+  return '<tr><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" '+s+'>'+nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
 }
 
 
@@ -383,6 +401,7 @@ window.chat.needMoreMessages = function() {
   if(activeTab === 'debug') return;
 
   var activeChat = $('#chat > :visible');
+  if(activeChat.length === 0) return;
 
   var hasScrollbar = scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
   var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
@@ -402,6 +421,7 @@ window.chat.chooser = function(event) {
   var tt = t.text();
 
   var mark = $('#chatinput mark');
+  var input = $('#chatinput input');
 
   $('#chatcontrols .active').removeClass('active');
   t.addClass('active');
@@ -412,11 +432,13 @@ window.chat.chooser = function(event) {
 
   switch(tt) {
     case 'faction':
+      input.css('color', '');
       mark.css('color', '');
       mark.text('tell faction:');
       break;
 
     case 'public':
+      input.css('cssText', 'color: red !important');
       mark.css('cssText', 'color: red !important');
       mark.text('broadcast:');
       break;
@@ -424,6 +446,7 @@ window.chat.chooser = function(event) {
     case 'compact':
     case 'full':
       mark.css('cssText', 'color: #bbb !important');
+      input.css('cssText', 'color: #bbb !important');
       mark.text('tell Jarvis:');
       break;
 
@@ -567,13 +590,13 @@ window.chat.postMsg = function() {
 
   if(c === 'debug') return new Function (msg)();
 
-  var public = c === 'public';
+  var publik = c === 'public';
   var latlng = map.getCenter();
 
   var data = {message: msg,
               latE6: Math.round(latlng.lat*1E6),
               lngE6: Math.round(latlng.lng*1E6),
-              factionOnly: !public};
+              factionOnly: !publik};
 
   var errMsg = 'Your message could not be delivered. You can copy&' +
                'paste it here and try again if you want:\n\n' + msg;
@@ -581,7 +604,7 @@ window.chat.postMsg = function() {
   window.postAjax('sendPlext', data,
     function(response) {
       if(response.error) alert(errMsg);
-      if(public) chat.requestPublic(false); else chat.requestFaction(false); },
+      if(publik) chat.requestPublic(false); else chat.requestFaction(false); },
     function() {
       alert(errMsg);
     }

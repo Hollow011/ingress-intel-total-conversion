@@ -320,11 +320,17 @@ function boot() {
   window.runOnSmartphonesBeforeBoot();
 
   // overwrite default Leaflet Marker icon to be a neutral color
-  var base = 'https://maps.google.com/mapfiles/kml/';
+  var base = 'https://maps.google.com/mapfiles/';
   L.Icon.Default.imagePath = base;
 
-  window.iconEnl = L.Icon.Default.extend({options: { iconUrl: base + 'paddle/grn-blank.png' } });
-  window.iconRes = L.Icon.Default.extend({options: { iconUrl: base + 'paddle/blu-blank.png' } });
+  window.iconEnl = L.Icon.Default.extend({options: { 
+    iconUrl: base + 'kml/paddle/grn-circle.png',
+    shadowUrl: base + 'ms/micons/msmarker.shadow.png'
+  } });
+  window.iconRes = L.Icon.Default.extend({options: { 
+    iconUrl: base + 'kml/paddle/blu-circle.png',
+    shadowUrl: base + 'ms/micons/msmarker.shadow.png'
+  } });
 
   window.setupTaphold();
   window.setupStyles();

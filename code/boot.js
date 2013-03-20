@@ -320,7 +320,7 @@ function boot() {
   window.runOnSmartphonesBeforeBoot();
 
   // overwrite default Leaflet Marker icon to be a neutral color
-  var base = 'https://maps.google.com/mapfiles/';
+  var base = 'https://maps.gstatic.com/mapfiles/';
   L.Icon.Default.imagePath = base;
 
   window.iconEnl = L.Icon.Default.extend({options: { 
